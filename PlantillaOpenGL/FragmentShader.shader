@@ -1,0 +1,15 @@
+#version 330 core
+
+//primera linea SIEMPRE es la versión
+
+//Atributos de entrada (Vienen desde el Vertex shader)
+in vec4 fragmentColor;
+
+//Atributos de salida
+out vec4 salidaColor;
+
+//Funcion main()
+void main()
+{
+	salidaColor = fragmentColor;
+}
