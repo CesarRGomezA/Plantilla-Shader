@@ -40,14 +40,14 @@ Shader::Shader(const char * rutaVertex, const char * rutaFragment)
 	}
 	else
 	{
-		cout << "No se pudo abrir el archivo" 
-		<< rutaVertex << endl;
+		cout << "No se pudo abrir el archivo"
+			<< rutaVertex << endl;
 	}
 
 	//Convertir de string a cadena de char
 	const char* cadenaCodigoVertex = codigoVertexShader.c_str();
 	const char* cadenaCodigoFragment = codigoFragmentShader.c_str();
-	
+
 	//1.Crear el programa de Shader
 	shaderID = glCreateProgram();
 	GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -64,11 +64,56 @@ Shader::Shader(const char * rutaVertex, const char * rutaFragment)
 	glCompileShader(fragmentShaderID);
 
 	//4. Verificar errores de compilación
+	verificarCompilacion(vertexShaderID);
+	verificarCompilacion(fragmentShaderID);
+
+	//5. Adjuntar shaders al programa
+	glAttachShader(shaderID, vertexShaderID);
+	glAttachShader(shaderID, fragmentShaderID);
+
+	//6. Vincualar el programa
+	glLinkProgram(shaderID);
+
+	//7. verificar la vinculación
+	verificarVinculacion(shaderID);
+
+	//8 Usar el programa 
+	glUseProgram(shaderID);
 
 }
 
 void Shader::verificarCompilacion(GLuint id) 
 {
 	GLint resultado = GL_FALSE;
-	int longitydlog = 0;
+	GLint longitudLog = 0;
+
+	glGetShaderiv(id, GL_COMPILE_STATUS, &resultado);
+	glGetShaderiv(id, GL_INFO_LOG_LENGTH, &longitudLog);
+
+
+	if (longitudLog > 0)
+	{
+		vector<char> mensajeError(longitudLog);
+		glGetShaderInfoLog(id, longitudLog, NULL, &mensajeError[0]);
+		for (vector<char>::const_iterator i = mensajeError.begin(); i != mensajeError.end(); i++) {
+			cout << *i;
+		}
+	}
+}
+
+void Shader::verificarVinculacion(GLuint id)
+{
+	GLint estadoVinvulacion, estadoValidacion;
+
+	glGetProgramiv(id, GL_LINK_STATUS, &estadoVinvulacion);
+	if (estadoVinvulacion == GL_FALSE)
+	{
+		cout << "No se pudo vincular proframa" << endl;
+	}
+
+	glGetProgramiv(id, GL_VALIDATE_STATUS, &estadoValidacion);
+	if (estadoValidacion == GL_FALSE)
+	{
+		cout << "No se pudo validar la vinculacion" << endl;
+	}
 }
